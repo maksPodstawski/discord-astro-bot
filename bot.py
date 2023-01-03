@@ -57,9 +57,17 @@ async def command(interaction: discord.Interaction, id: str):
         embed.add_field(name="Rounds Played:", value=f"{player.roundsPlayed}", inline=False)
         embed.add_field(name="Win Percentage:", value=f"{player.wlPercentage}", inline=False)
         embed.add_field(name="Percentage of headshots:", value=f"{player.headshotPct}", inline=False)
+        embed.set_footer(text=f'Data povided by: https://tracker.gg/csgo')
         await interaction.response.send_message(embed=embed, view=view)
     except:
-        await interaction.response.send_message(f'User with given id {id} does not exist or was misspelled,\n if you cant find your steam id, use the information here https://help.steampowered.com/en/faqs/view/2816-BE67-5B69-0FEC')
+        button = Button(label="How to get a STEAM_ID", style=discord.ButtonStyle.green, url=f"https://help.steampowered.com/en/faqs/view/2816-BE67-5B69-0FEC")
+        view = View()
+        view.add_item(button)
+        embed = discord.Embed(title=f"ERROR 404: NOT FOUND", color=0x00bfff)
+        embed.add_field(name=f'User with given id {id} do not exist', value=f'You probably made a typo, please try again', inline=True)
+        embed.add_field(name="Problem with getting yours STEAM_ID?", value=f"Just click the button below!", inline=False)
+        embed.set_footer(text=f'Data povided by: https://tracker.gg/csgo')
+        await interaction.response.send_message(embed=embed, view=view)
 
         
 
