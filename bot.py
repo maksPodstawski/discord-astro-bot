@@ -65,6 +65,7 @@ async def command(interaction: discord.Interaction, id: str):
 
 @tree.command(name= "price", description= "Check the price of Escape from Tarkov items", guild=discord.Object(id=1034080877615001670))
 async def command(interaction: discord.Interaction,search: str):
+    try:
         currency = "\u20BD"
         item_data = get_item_data(search)
         item_name = item_data['name']
@@ -89,7 +90,13 @@ async def command(interaction: discord.Interaction,search: str):
         embed.add_field(name="Price:", value=f'{format_price}{currency}\n(lowest price)', inline=True)
         embed.add_field(name="Price Per Slot:", value=f'{format_priceperslot}{currency}\n({slots}{slots1})', inline=True)
         embed.add_field(name="Price Difference:", value=f'48h change:\n{item_last48}% ', inline=True)
+        embed.set_footer(text="Data povided by: https://tarkov.dev/api/")
         await interaction.response.send_message(embed=embed, view=view)
+    except:
+        embed = discord.Embed(title=f"ERROR 404: NOT FOUND", color=0x00bfff)
+        embed.add_field(name=f'Item {search} do not exist', value=f'You probably made a typo, please try again', inline=True)
+        embed.set_footer(text=f'Data povided by: https://tarkov.dev/api/')
+        await interaction.response.send_message(embed=embed)
         
 
 
