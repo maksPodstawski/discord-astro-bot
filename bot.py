@@ -38,6 +38,7 @@ async def clearuser(interaction: discord.Interaction, user: discord.User, amount
 
 @tree.command(name="csgostats", description="See Your stats in CS GO", guild=discord.Object(id=1034080877615001670))
 async def command(interaction: discord.Interaction, id: str):
+
     try:
         player = csgoUser(id)
         button = Button(label="Steam", style=discord.ButtonStyle.green, url=f"https://steamcommunity.com/id/{id}/")
@@ -76,10 +77,10 @@ async def tier(interaction: discord.Interaction):
     currency = "\u20BD"
     greaterorequal = '\u2265'
     embed = discord.Embed(title=f"Loot Tiers", color=0x00bfff)
-    embed.add_field(name=":star:Legendary", value=f"{greaterorequal} 40 000{currency}", inline=False)
-    embed.add_field(name=":green_circle:Great", value=f"{greaterorequal} 30 000{currency}", inline=False)
-    embed.add_field(name=":yellow_circle:Average", value=f"{greaterorequal} 20 000{currency}", inline=False)
-    embed.add_field(name=":red_circle:Poor", value=f"{greaterorequal} 10 000{currency}", inline=False)
+    embed.add_field(name=":star:Legendary", value=f"{greaterorequal} 40ï¿½000{currency}", inline=False)
+    embed.add_field(name=":green_circle:Great", value=f"{greaterorequal} 30ï¿½000{currency}", inline=False)
+    embed.add_field(name=":yellow_circle:Average", value=f"{greaterorequal} 20ï¿½000{currency}", inline=False)
+    embed.add_field(name=":red_circle:Poor", value=f"{greaterorequal} 10ï¿½000{currency}", inline=False)
     embed.add_field(name=":x:Trash", value=f"< 10 000{currency}",  inline=False)
     await interaction.response.send_message(embed=embed)      
 
@@ -122,8 +123,8 @@ async def command(interaction: discord.Interaction,search: str):
         embed.add_field(name=f'Item {search} do not exist', value=f'You probably made a typo, please try again', inline=True)
         embed.set_footer(text=f'Data povided by: https://tarkov.dev/api/')
         await interaction.response.send_message(embed=embed)
-
-
+        await interaction.response.send_message(embed=embed, view=view)
+        
 @client.event
 async def on_ready():
     await tree.sync(guild=discord.Object(id=1034080877615001670))
