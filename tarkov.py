@@ -1,4 +1,5 @@
 import requests
+import json
 
 
 def run_query(query):
@@ -20,7 +21,7 @@ def get_item_data(name):
             width
             height
             changeLast48hPercent
-            
+            updated
         }}
     }}
     """
@@ -36,6 +37,7 @@ def get_item_data(name):
     item_width = items[0]['width']
     item_height = items[0]['height']
     item_last48 = items[0]['changeLast48hPercent']
+    item_update = items[0]['updated']
     
 
     return {
@@ -45,5 +47,18 @@ def get_item_data(name):
         'wikiLink': item_link,
         'width':item_width,
         'height':item_height,
-        'changeLast48hPercent':item_last48
+        'changeLast48hPercent':item_last48,
+        'updated':item_update
     }
+
+def get_tier(search):
+    if search >= 40000:
+        return ':star:Legendary'
+    elif search >= 30000:
+        return ':green_circle:Great'
+    elif search >= 20000:
+        return ':yellow_circle:Average'
+    elif search >= 10000:
+        return ':red_circle:Poor'
+    else:
+        return ':x:Trash'  

@@ -6,6 +6,8 @@ from discord.ext import commands
 from discord.ui import Button, View
 from csgoUser import csgoUser
 from tarkov import get_item_data
+from tarkov import get_tier
+from datetime import datetime
 import os
 
 load_dotenv()
@@ -69,7 +71,17 @@ async def command(interaction: discord.Interaction, id: str):
         embed.set_footer(text=f'Data povided by: https://tracker.gg/csgo')
         await interaction.response.send_message(embed=embed, view=view)
 
-        
+@tree.command(name= "tier", description= "Tiers are assigned using slot price identification", guild=discord.Object(id=1034080877615001670))
+async def tier(interaction: discord.Interaction):
+    currency = "\u20BD"
+    greaterorequal = '\u2265'
+    embed = discord.Embed(title=f"Loot Tiers", color=0x00bfff)
+    embed.add_field(name=":star:Legendary", value=f"{greaterorequal} 40 000{currency}", inline=False)
+    embed.add_field(name=":green_circle:Great", value=f"{greaterorequal} 30 000{currency}", inline=False)
+    embed.add_field(name=":yellow_circle:Average", value=f"{greaterorequal} 20 000{currency}", inline=False)
+    embed.add_field(name=":red_circle:Poor", value=f"{greaterorequal} 10 000{currency}", inline=False)
+    embed.add_field(name=":x:Trash", value=f"< 10 000{currency}",  inline=False)
+    await interaction.response.send_message(embed=embed)      
 
 @tree.command(name= "price", description= "Check the price of Escape from Tarkov items", guild=discord.Object(id=1034080877615001670))
 async def command(interaction: discord.Interaction,search: str):
@@ -83,6 +95,9 @@ async def command(interaction: discord.Interaction,search: str):
         item_link = item_data['wikiLink']
         item_width = item_data['width']
         item_height = item_data['height']
+        item_update = item_data['updated']
+        date = datetime.fromisoformat(item_update)
+        formatted_date = date.strftime("%d %B %Y, %H:%M:%S")
         slots = item_width*item_height
         price_perslot = item_price//slots
         slots1 = "slots"
@@ -95,9 +110,11 @@ async def command(interaction: discord.Interaction,search: str):
         view.add_item(button)
         embed = discord.Embed(title=f"{item_name}", color=0x00bfff)
         embed.set_thumbnail(url=item_icon)
-        embed.add_field(name="Price:", value=f'{format_price}{currency}\n(lowest price)', inline=True)
-        embed.add_field(name="Price Per Slot:", value=f'{format_priceperslot}{currency}\n({slots}{slots1})', inline=True)
-        embed.add_field(name="Price Difference:", value=f'48h change:\n{item_last48}% ', inline=True)
+        embed.add_field(name="Price:", value=f' > {format_price}{currency}\n > (lowest price)', inline=True)
+        embed.add_field(name="Per Slot:", value=f' > {format_priceperslot}{currency}\n > ({slots} {slots1})', inline=True)
+        embed.add_field(name="Difference:", value=f' > 48h change:\n > {item_last48}% ', inline=True)
+        embed.add_field(name="Tier:", value=get_tier(price_perslot), inline=False)
+        embed.add_field(name="Last update:", value=formatted_date, inline=False)
         embed.set_footer(text="Data povided by: https://tarkov.dev/api/")
         await interaction.response.send_message(embed=embed, view=view)
     except:
@@ -105,9 +122,6 @@ async def command(interaction: discord.Interaction,search: str):
         embed.add_field(name=f'Item {search} do not exist', value=f'You probably made a typo, please try again', inline=True)
         embed.set_footer(text=f'Data povided by: https://tarkov.dev/api/')
         await interaction.response.send_message(embed=embed)
-        
-
-
 
 
 @client.event
