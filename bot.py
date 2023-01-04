@@ -123,7 +123,6 @@ async def command(interaction: discord.Interaction,search: str):
         embed.add_field(name=f'Item {search} do not exist', value=f'You probably made a typo, please try again', inline=True)
         embed.set_footer(text=f'Data povided by: https://tarkov.dev/api/')
         await interaction.response.send_message(embed=embed)
-        await interaction.response.send_message(embed=embed, view=view)
         
 @client.event
 async def on_ready():
