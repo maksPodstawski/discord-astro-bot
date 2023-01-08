@@ -5,6 +5,7 @@ from discord import app_commands
 from discord.ext import commands
 from discord.ui import Button, View
 from csgoUser import csgoUser
+from apex import apexstats
 from tarkov import get_item_data
 from tarkov import get_tier
 from datetime import datetime
@@ -172,7 +173,38 @@ async def command(interaction: discord.Interaction, nickname: str, region: regio
         embed.add_field(name=f"User {nickname} on region {region.name} do not exist", value="Check the spelling, or try with other region", inline=False)
         embed.set_footer(text="Data povided by: https://www.leagueoflegends.com/")
         await interaction.response.send_message(embed=embed, view=view)
-        
+
+class ApexPlatforms(Enum):
+    Origin = "origin"
+    XboxLive = "xbl"
+    PlayStationNetwork = "psn"
+
+@tree.command(name="apexstats", description="See your stats in Apex", guild=discord.Object(id=1034080877615001670))
+async def command(interaction: discord.Interaction, nickname: str, platform: ApexPlatforms):
+    apexPlayer = apexstats(platform=platform.value, nickname=nickname)
+    print(apexPlayer.response)
+    if apexPlayer.response == 200:
+        view = View()
+        apexPlayer = apexstats(platform=platform.value, nickname=nickname)
+        embed = discord.Embed(title=f"User {nickname}", color=0x00bfff)
+        embed.set_thumbnail(url=apexPlayer.avatarUrl)
+        embed.add_field(name="Kills: ", value=apexPlayer.kills, inline=True)
+        embed.add_field(name="Level: ", value=apexPlayer.level, inline=True)
+        embed.add_field(name="Damage: ", value=apexPlayer.damage, inline=True)
+        embed.add_field(name=f"**Ranked**", value=f"> **Rank:**\n>  {apexPlayer.rankName}\n> **MMR:**\n> {apexPlayer.rankValue}\n", inline=True)
+        embed.add_field(name=f"**Arena**", value=f"> **Rank:**\n>  {apexPlayer.arenaRankName}\n> **MMR:**\n> {apexPlayer.arenaRankValue}\n", inline=True)
+        embed.add_field(name=f"**Ranked peak**", value=f"> **Rank peak:**\n>  {apexPlayer.peakRankName}\n> **MMR peak:**\n> {apexPlayer.peakRankValue}\n", inline=True)
+        embed.set_footer(text="Data povided by: https://tracker.gg/apex")
+        await interaction.response.send_message(embed=embed, view=view)
+
+    else:
+        view = View()
+        embed = discord.Embed(title="ERROR 404: NOT FOUND", color=0x00bfff)
+        embed.add_field(name=f"User {nickname} on platform {platform.name} do not exist", value="Check the spelling, or try with other platform", inline=False)
+        embed.set_footer(text="Data povided by: https://tracker.gg/apex")
+        await interaction.response.send_message(embed=embed, view=view)
+
+
 @client.event
 async def on_ready():
     await tree.sync(guild=discord.Object(id=1034080877615001670))
