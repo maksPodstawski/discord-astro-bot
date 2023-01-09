@@ -11,6 +11,7 @@ from datetime import datetime
 from lol import summonerstats
 import os
 from enum import Enum
+from weather import get_city, get_weather_data
 
 load_dotenv()
 
@@ -79,10 +80,10 @@ async def tier(interaction: discord.Interaction):
     currency = "\u20BD"
     greaterorequal = '\u2265'
     embed = discord.Embed(title=f"Loot Tiers", color=0x00bfff)
-    embed.add_field(name=":star:Legendary", value=f"{greaterorequal} 40�000{currency}", inline=False)
-    embed.add_field(name=":green_circle:Great", value=f"{greaterorequal} 30�000{currency}", inline=False)
-    embed.add_field(name=":yellow_circle:Average", value=f"{greaterorequal} 20�000{currency}", inline=False)
-    embed.add_field(name=":red_circle:Poor", value=f"{greaterorequal} 10�000{currency}", inline=False)
+    embed.add_field(name=":star:Legendary", value=f"{greaterorequal} 40 000{currency}", inline=False)
+    embed.add_field(name=":green_circle:Great", value=f"{greaterorequal} 30 000{currency}", inline=False)
+    embed.add_field(name=":yellow_circle:Average", value=f"{greaterorequal} 20 000{currency}", inline=False)
+    embed.add_field(name=":red_circle:Poor", value=f"{greaterorequal} 10 000{currency}", inline=False)
     embed.add_field(name=":x:Trash", value=f"< 10 000{currency}",  inline=False)
     await interaction.response.send_message(embed=embed)      
 
@@ -173,6 +174,43 @@ async def command(interaction: discord.Interaction, nickname: str, region: regio
         embed.set_footer(text="Data povided by: https://www.leagueoflegends.com/")
         await interaction.response.send_message(embed=embed, view=view)
         
+@tree.command(name= "weather", description= "Check the weather of your city!", guild=discord.Object(id=1034080877615001670))
+async def weather(interaction: discord.Interaction, city: str ):
+    try:
+        celsius = '\u2103'
+        city_number = get_city(city)
+        data = get_weather_data(city_number)
+        citywithpl = data['stacja']
+        temperature = float(data['temperatura'])
+        pressure = data['cisnienie']
+        hours = data['godzina_pomiaru']
+        dates = data['data_pomiaru']
+        id_weather = data['id_stacji']
+        percipitation = data['suma_opadu']
+        icon = "https://pl.seaicons.com/wp-content/uploads/2015/10/weather-icon3.png"
+        if temperature < 0:
+            icon = 'https://cdn-icons-png.flaticon.com/512/6232/6232631.png'
+        if temperature > 20:
+            icon = 'https://cdn-icons-png.flaticon.com/512/979/979585.png'
+        embed = discord.Embed(title=f"Weather forecast for {citywithpl}", color=0x00bfff)
+        embed.set_thumbnail(url=icon)
+        embed.add_field(name="Weather station id", value=f" > {id_weather}", inline=False)
+        embed.add_field(name="Measuring date", value=f" > {dates}", inline=False)
+        embed.add_field(name="Measuring hour", value=f" >  {hours}:00", inline=False)
+        embed.add_field(name="Temperature", value=f" >  {temperature}{celsius}", inline=False)
+        embed.add_field(name="Atmospheric pressure", value=f" >  {pressure}hPa", inline=False)
+        embed.add_field(name="Total precipitation", value=f" >  {percipitation}mm", inline=False)
+        embed.set_footer(text="Data povided by: https://danepubliczne.imgw.pl/api/data/synop/")
+        await interaction.response.send_message(embed=embed)
+    except:
+        embed = discord.Embed(title="ERROR 404: NOT FOUND", color=0x00bfff)
+        embed.add_field(name=f"City {city} do not exist in database", value="This command only show weather of poland cites \n where weather outposts are located", inline=False)
+        embed.set_footer(text="Data povided by: https://danepubliczne.imgw.pl/api/data/synop/")
+        await interaction.response.send_message(embed=embed)
+
+   
+
+
 @client.event
 async def on_ready():
     await tree.sync(guild=discord.Object(id=1034080877615001670))
