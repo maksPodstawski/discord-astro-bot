@@ -8,7 +8,7 @@ from csgoUser import csgoUser
 from tarkov import get_item_data
 from tarkov import get_tier
 from datetime import datetime
-from lol import summonerstats
+from riot import summonerstats, tftstats
 import os
 from enum import Enum
 
@@ -21,14 +21,14 @@ client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 
 
-@tree.command(name= "clear", description= "Select the number of messages to clear", guild=discord.Object(id=1034080877615001670))
+@tree.command(name= "clear", description= "Select the number of messages to clear")
 @commands.has_permissions(manage_messages=True)
 async def clear(interaction: discord.Interaction, amount: int):
     await interaction.response.send_message(f"chat vacuuming in progress")
     await interaction.channel.purge(limit=amount+1)
 
 
-@tree.command(name= "clearuser", description= "select the user whose messages you want to delete and enter the number of messages", guild=discord.Object(id=1034080877615001670))
+@tree.command(name= "clearuser", description= "select the user whose messages you want to delete and enter the number of messages")
 @commands.has_permissions(manage_messages=True, manage_roles=True)
 async def clearuser(interaction: discord.Interaction, user: discord.User, amount: int):
   def check(m):
@@ -38,7 +38,7 @@ async def clearuser(interaction: discord.Interaction, user: discord.User, amount
   await interaction.channel.purge(limit=1)
 
 
-@tree.command(name="csgostats", description="See Your stats in CS GO", guild=discord.Object(id=1034080877615001670))
+@tree.command(name="csgostats", description="See Your stats in CS GO")
 async def command(interaction: discord.Interaction, id: str):
 
     try:
@@ -74,7 +74,7 @@ async def command(interaction: discord.Interaction, id: str):
         embed.set_footer(text=f'Data povided by: https://tracker.gg/csgo')
         await interaction.response.send_message(embed=embed, view=view)
 
-@tree.command(name= "tier", description= "Tiers are assigned using slot price identification", guild=discord.Object(id=1034080877615001670))
+@tree.command(name= "tier", description= "Tiers are assigned using slot price identification")
 async def tier(interaction: discord.Interaction):
     currency = "\u20BD"
     greaterorequal = '\u2265'
@@ -86,7 +86,7 @@ async def tier(interaction: discord.Interaction):
     embed.add_field(name=":x:Trash", value=f"< 10 000{currency}",  inline=False)
     await interaction.response.send_message(embed=embed)      
 
-@tree.command(name= "price", description= "Check the price of Escape from Tarkov items", guild=discord.Object(id=1034080877615001670))
+@tree.command(name= "price", description= "Check the price of Escape from Tarkov items")
 async def command(interaction: discord.Interaction,search: str):
     try:
         currency = "\u20BD"
@@ -137,45 +137,69 @@ class regions(Enum):
     Turkey = "TR1"
     Koeran = "KR"
  
-@tree.command(name="summonerstats", description="See your stats in League of Legends", guild=discord.Object(id=1034080877615001670))
+@tree.command(name="summonerstats", description="See your stats in League of Legends")
 async def command(interaction: discord.Interaction, nickname: str, region: regions):
     try:
-        app_commands.choices
         player = summonerstats(nickname, region.value) 
         view = View()
         embed = discord.Embed(title=f"Nick: {player.username}", color=0x00bfff)
         embed.set_thumbnail(url=player.icon)
-        ts1 = int(f'{player.championMasteryLastplaytime1}')
-        ts2 = int(f'{player.championMasteryLastplaytime2}')
-        ts3 = int(f'{player.championMasteryLastplaytime3}')
-        ts1 /= 1000
-        ts2 /= 1000
-        ts3 /= 1000
-        date1 = datetime.utcfromtimestamp(ts1).strftime('%d-%m-%Y')
-        date2 = datetime.utcfromtimestamp(ts2).strftime('%d-%m-%Y')
-        date3 = datetime.utcfromtimestamp(ts3).strftime('%d-%m-%Y')
         embed.add_field(name="Summoner level:", value=f"{player.summonerLevel}", inline=False)
-        if hasattr(player,'tier') != 0:
+        if hasattr(player,"tier") != 0:
             embed.add_field(name="Rank Solo/Duo:", value=f"{player.tier} {player.rank}\n\n **Wins:** {player.wins}\n **Losses:** {player.losses}\n **All Games:** {player.allGames}\n **Winratio:** {round(player.winratio,2)}%",inline=True)
-        if hasattr(player,'tierFlex') != 0:
+        if hasattr(player,"tierFlex") != 0:
             embed.add_field(name="Rank Flex:", value=f"{player.tierFlex} {player.rankFlex}\n\n **Wins:** {player.winsFlex}\n **Losses:** {player.lossesFlex}\n **All Games:** {player.allGamesFlex}\n **Winratio:** {round(player.winratioFlex,2)}%",inline=True)
-        embed.add_field(name="Total mastery points:", value=f"{player.totalChampionMastery}", inline=False)
-        embed.add_field(name="***Top 3 champions by mastery points:***", value="\u200b", inline=False)
-        embed.add_field(name=f"**Top 1**", value=f"> **Name:**\n>  {player.championMasteryName1}\n> **Lvl:** {player.championMasteryLevel1}\n> **Mastery Points:**\n> {format(player.championMasteryPoints1,',')}\n> **Last played in:** {date1}",inline=True)
-        embed.add_field(name=f"**Top 2**", value=f"> **Name:**\n> {player.championMasteryName2}\n> **Lvl:** {player.championMasteryLevel2}\n> **Mastery Points:**\n> {format(player.championMasteryPoints2,',')}\n> **Last played in:** {date2}",inline=True)
-        embed.add_field(name=f"**Top 3**", value=f"> **Name:**\n> {player.championMasteryName3}\n> **Lvl:** {player.championMasteryLevel3}\n> **Mastery Points:**\n> {format(player.championMasteryPoints3,',')}\n> **Last played in:** {date3}",inline=True)
-        embed.add_field(name="Data povided by:", value = "https://www.leagueoflegends.com/", inline=False)
+        if hasattr(player,"championMasteryName1") != 0:
+            ts1 = int(f'{player.championMasteryLastplaytime1}')
+            ts2 = int(f'{player.championMasteryLastplaytime2}')
+            ts3 = int(f'{player.championMasteryLastplaytime3}')
+            ts1 /= 1000
+            ts2 /= 1000
+            ts3 /= 1000
+            date1 = datetime.utcfromtimestamp(ts1).strftime('%d-%m-%Y')
+            date2 = datetime.utcfromtimestamp(ts2).strftime('%d-%m-%Y')
+            date3 = datetime.utcfromtimestamp(ts3).strftime('%d-%m-%Y')
+            embed.add_field(name="Total mastery points:", value=f"{player.totalChampionMastery}", inline=False)
+            embed.add_field(name="***Top 3 champions by mastery points:***", value="\u200b", inline=False)
+            embed.add_field(name=f"**Top 1**", value=f"> **Name:**\n>  {player.championMasteryName1}\n> **Lvl:** {player.championMasteryLevel1}\n> **Mastery Points:**\n> {format(player.championMasteryPoints1,',')}\n> **Last played in:** {date1}",inline=True)
+            embed.add_field(name=f"**Top 2**", value=f"> **Name:**\n> {player.championMasteryName2}\n> **Lvl:** {player.championMasteryLevel2}\n> **Mastery Points:**\n> {format(player.championMasteryPoints2,',')}\n> **Last played in:** {date2}",inline=True)
+            embed.add_field(name=f"**Top 3**", value=f"> **Name:**\n> {player.championMasteryName3}\n> **Lvl:** {player.championMasteryLevel3}\n> **Mastery Points:**\n> {format(player.championMasteryPoints3,',')}\n> **Last played in:** {date3}",inline=True)
+        embed.add_field(name="Data povided by:", value = "https://developer.riotgames.com/", inline=False)
         await interaction.response.send_message(embed=embed, view=view)
     except:
         view = View()
         embed = discord.Embed(title="ERROR 404: NOT FOUND", color=0x00bfff)
         embed.add_field(name=f"User {nickname} on region {region.name} do not exist", value="Check the spelling, or try with other region", inline=False)
-        embed.set_footer(text="Data povided by: https://www.leagueoflegends.com/")
+        embed.set_footer(text="Data povided by: https://developer.riotgames.com/")
         await interaction.response.send_message(embed=embed, view=view)
         
+@tree.command(name="tftstats", description="See your stats in Teamfight Tactics")
+async def command(interaction: discord.Interaction, nickname: str, region: regions):
+    #try:
+        player = tftstats(nickname, region.value)
+        view = View()
+        embed = discord.Embed(title=f"Nick: {player.tftUsername}", color=0x00bfff)
+        embed.set_thumbnail(url=player.tftIcon)
+        embed.add_field(name="Summoner level:", value=f"{player.tftSummonerLevel}", inline=False)
+        if hasattr(player,'tftTier') != 0:
+            embed.add_field(name="Rank Solo:", value=f"{player.tftTier} {player.tftRank}\n\n> **Wins:** {player.tftWins}\n> **Losses:** {player.tftLosses}\n> **All Games:** {player.tftAllGames}\n> **Winratio:** {round(player.tftWinratio,2)}%",inline=True)
+        if hasattr(player,'tftTurboTier') != 0:    
+            embed.add_field(name="Rank Turbo:", value=f"{player.tftTurboTier} {player.tftTurboRank}\n\n> **Wins:** {player.tftTurboWins}\n> **Losses:** {player.tftTurboLosses}\n> **All Games:** {player.tftTurboAllGames}\n> **Winratio:** {round(player.tftTurboWinratio,2)}%",inline=True)
+        if hasattr(player,'tftDoubleTier') != 0:    
+            embed.add_field(name="Rank Double:", value=f"{player.tftDoubleTier} {player.tftDoubleRank}\n\n> **Wins:** {player.tftDoubleWins}\n> **Losses:** {player.tftDoubleLosses}\n> **All Games:** {player.tftDoubleAllGames}\n> **Winratio:** {round(player.tftDoubleWinratio,2)}%",inline=True)
+        embed.add_field(name="Data povided by:", value = "https://developer.riotgames.com/", inline=False)
+        await interaction.response.send_message(embed=embed, view=view)
+   # except:
+    #    view = View()
+     #   embed = discord.Embed(title="ERROR 404: NOT FOUND", color=0x00bfff)
+      #  embed.add_field(name=f"User {nickname} on region {region.name} do not exist", value="Check the spelling, or try with other region", inline=False)
+       # embed.set_footer(text="Data povided by: https://developer.riotgames.com/")
+       # await interaction.response.send_message(embed=embed, view=view)   
+
+
 @client.event
 async def on_ready():
-    await tree.sync(guild=discord.Object(id=1034080877615001670))
+    await tree.sync()
     print(f'We have logged in as {client.user}')
 
 
