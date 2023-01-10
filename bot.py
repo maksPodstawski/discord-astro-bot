@@ -9,7 +9,7 @@ from apex import apexstats
 from tarkov import get_item_data
 from tarkov import get_tier
 from datetime import datetime
-from lol import summonerstats
+from riot import summonerstats, tftstats
 import os
 from enum import Enum
 
@@ -203,6 +203,30 @@ async def command(interaction: discord.Interaction, nickname: str, platform: Ape
         embed.add_field(name=f"User {nickname} on platform {platform.name} do not exist", value="Check the spelling, or try with other platform", inline=False)
         embed.set_footer(text="Data povided by: https://tracker.gg/apex")
         await interaction.response.send_message(embed=embed, view=view)
+
+
+@tree.command(name="tftstats", description="See your stats in Teamfight Tactics")
+async def command(interaction: discord.Interaction, nickname: str, region: regions):
+    try:
+        player = tftstats(nickname, region.value)
+        view = View()
+        embed = discord.Embed(title=f"Nick: {player.tftUsername}", color=0x00bfff)
+        embed.set_thumbnail(url=player.tftIcon)
+        embed.add_field(name="Summoner level:", value=f"{player.tftSummonerLevel}", inline=False)
+        if hasattr(player,'tftTier') != 0:
+            embed.add_field(name="Rank Solo:", value=f"{player.tftTier} {player.tftRank}\n\n> **Wins:** {player.tftWins}\n> **Losses:** {player.tftLosses}\n> **All Games:** {player.tftAllGames}\n> **Winratio:** {round(player.tftWinratio,2)}%",inline=True)
+        if hasattr(player,'tftTurboTier') != 0:    
+            embed.add_field(name="Rank Turbo:", value=f"{player.tftTurboTier} {player.tftTurboRank}\n\n> **Wins:** {player.tftTurboWins}\n> **Losses:** {player.tftTurboLosses}\n> **All Games:** {player.tftTurboAllGames}\n> **Winratio:** {round(player.tftTurboWinratio,2)}%",inline=True)
+        if hasattr(player,'tftDoubleTier') != 0:    
+            embed.add_field(name="Rank Double:", value=f"{player.tftDoubleTier} {player.tftDoubleRank}\n\n> **Wins:** {player.tftDoubleWins}\n> **Losses:** {player.tftDoubleLosses}\n> **All Games:** {player.tftDoubleAllGames}\n> **Winratio:** {round(player.tftDoubleWinratio,2)}%",inline=True)
+        embed.add_field(name="Data povided by:", value = "https://developer.riotgames.com/", inline=False)
+        await interaction.response.send_message(embed=embed, view=view)
+    except:
+        view = View()
+        embed = discord.Embed(title="ERROR 404: NOT FOUND", color=0x00bfff)
+        embed.add_field(name=f"User {nickname} on region {region.name} do not exist", value="Check the spelling, or try with other region", inline=False)
+        embed.set_footer(text="Data povided by: https://developer.riotgames.com/")
+        await interaction.response.send_message(embed=embed, view=view)   
 
 
 @client.event
