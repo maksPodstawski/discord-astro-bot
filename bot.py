@@ -140,37 +140,37 @@ class regions(Enum):
 @tree.command(name="summonerstats", description="See your stats in League of Legends", guild=discord.Object(id=1034080877615001670))
 async def command(interaction: discord.Interaction, nickname: str, region: regions):
     try:
-        app_commands.choices
         player = summonerstats(nickname, region.value) 
         view = View()
         embed = discord.Embed(title=f"Nick: {player.username}", color=0x00bfff)
         embed.set_thumbnail(url=player.icon)
-        ts1 = int(f'{player.championMasteryLastplaytime1}')
-        ts2 = int(f'{player.championMasteryLastplaytime2}')
-        ts3 = int(f'{player.championMasteryLastplaytime3}')
-        ts1 /= 1000
-        ts2 /= 1000
-        ts3 /= 1000
-        date1 = datetime.utcfromtimestamp(ts1).strftime('%d-%m-%Y')
-        date2 = datetime.utcfromtimestamp(ts2).strftime('%d-%m-%Y')
-        date3 = datetime.utcfromtimestamp(ts3).strftime('%d-%m-%Y')
         embed.add_field(name="Summoner level:", value=f"{player.summonerLevel}", inline=False)
-        if hasattr(player,'tier') != 0:
+        if hasattr(player,"tier") != 0:
             embed.add_field(name="Rank Solo/Duo:", value=f"{player.tier} {player.rank}\n\n **Wins:** {player.wins}\n **Losses:** {player.losses}\n **All Games:** {player.allGames}\n **Winratio:** {round(player.winratio,2)}%",inline=True)
-        if hasattr(player,'tierFlex') != 0:
+        if hasattr(player,"tierFlex") != 0:
             embed.add_field(name="Rank Flex:", value=f"{player.tierFlex} {player.rankFlex}\n\n **Wins:** {player.winsFlex}\n **Losses:** {player.lossesFlex}\n **All Games:** {player.allGamesFlex}\n **Winratio:** {round(player.winratioFlex,2)}%",inline=True)
-        embed.add_field(name="Total mastery points:", value=f"{player.totalChampionMastery}", inline=False)
-        embed.add_field(name="***Top 3 champions by mastery points:***", value="\u200b", inline=False)
-        embed.add_field(name=f"**Top 1**", value=f"> **Name:**\n>  {player.championMasteryName1}\n> **Lvl:** {player.championMasteryLevel1}\n> **Mastery Points:**\n> {format(player.championMasteryPoints1,',')}\n> **Last played in:** {date1}",inline=True)
-        embed.add_field(name=f"**Top 2**", value=f"> **Name:**\n> {player.championMasteryName2}\n> **Lvl:** {player.championMasteryLevel2}\n> **Mastery Points:**\n> {format(player.championMasteryPoints2,',')}\n> **Last played in:** {date2}",inline=True)
-        embed.add_field(name=f"**Top 3**", value=f"> **Name:**\n> {player.championMasteryName3}\n> **Lvl:** {player.championMasteryLevel3}\n> **Mastery Points:**\n> {format(player.championMasteryPoints3,',')}\n> **Last played in:** {date3}",inline=True)
-        embed.add_field(name="Data povided by:", value = "https://www.leagueoflegends.com/", inline=False)
+        if hasattr(player,"championMasteryName1") != 0:
+            ts1 = int(f'{player.championMasteryLastplaytime1}')
+            ts2 = int(f'{player.championMasteryLastplaytime2}')
+            ts3 = int(f'{player.championMasteryLastplaytime3}')
+            ts1 /= 1000
+            ts2 /= 1000
+            ts3 /= 1000
+            date1 = datetime.utcfromtimestamp(ts1).strftime('%d-%m-%Y')
+            date2 = datetime.utcfromtimestamp(ts2).strftime('%d-%m-%Y')
+            date3 = datetime.utcfromtimestamp(ts3).strftime('%d-%m-%Y')
+            embed.add_field(name="Total mastery points:", value=f"{player.totalChampionMastery}", inline=False)
+            embed.add_field(name="***Top 3 champions by mastery points:***", value="\u200b", inline=False)
+            embed.add_field(name=f"**Top 1**", value=f"> **Name:**\n>  {player.championMasteryName1}\n> **Lvl:** {player.championMasteryLevel1}\n> **Mastery Points:**\n> {format(player.championMasteryPoints1,',')}\n> **Last played in:** {date1}",inline=True)
+            embed.add_field(name=f"**Top 2**", value=f"> **Name:**\n> {player.championMasteryName2}\n> **Lvl:** {player.championMasteryLevel2}\n> **Mastery Points:**\n> {format(player.championMasteryPoints2,',')}\n> **Last played in:** {date2}",inline=True)
+            embed.add_field(name=f"**Top 3**", value=f"> **Name:**\n> {player.championMasteryName3}\n> **Lvl:** {player.championMasteryLevel3}\n> **Mastery Points:**\n> {format(player.championMasteryPoints3,',')}\n> **Last played in:** {date3}",inline=True)
+        embed.add_field(name="Data povided by:", value = "https://developer.riotgames.com/", inline=False)
         await interaction.response.send_message(embed=embed, view=view)
     except:
         view = View()
         embed = discord.Embed(title="ERROR 404: NOT FOUND", color=0x00bfff)
         embed.add_field(name=f"User {nickname} on region {region.name} do not exist", value="Check the spelling, or try with other region", inline=False)
-        embed.set_footer(text="Data povided by: https://www.leagueoflegends.com/")
+        embed.set_footer(text="Data povided by: https://developer.riotgames.com/")
         await interaction.response.send_message(embed=embed, view=view)
         
 @client.event
