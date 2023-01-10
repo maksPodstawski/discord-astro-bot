@@ -22,24 +22,31 @@ client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 
 
-@tree.command(name= "clear", description= "Select the number of messages to clear", guild=discord.Object(id=os.getenv("GUILD")))
+@tree.command(name= "clear", description= "Select the number of messages to clear")
 @commands.has_permissions(manage_messages=True)
 async def clear(interaction: discord.Interaction, amount: int):
-    await interaction.response.send_message(f"chat vacuuming in progress")
-    await interaction.channel.purge(limit=amount+1)
+    try:
+        await interaction.response.send_message(f"chat vacuuming in progress")
+        await interaction.channel.purge(limit=amount+1)
+    except:
+        await interaction.response.send_message(f"You dont have priviliges to use this command")
 
 
-@tree.command(name= "clearuser", description= "select the user whose messages you want to delete and enter the number of messages", guild=discord.Object(id=os.getenv("GUILD")))
-@commands.has_permissions(manage_messages=True, manage_roles=True)
-async def clearuser(interaction: discord.Interaction, user: discord.User, amount: int):
-  def check(m):
-    return m.author == user
-  await interaction.response.send_message(f"chat vacuuming in progress")
-  await interaction.channel.purge(limit=amount+1, check=check)
-  await interaction.channel.purge(limit=1)
+@tree.command(name= "clearuser", description= "select the user whose messages you want to delete and enter the number of messages")
+@commands.has_permissions(manage_messages=True)
+async def clearuser(interaction: discord.Interaction, user: discord.User, amount: int):  
+    try:
+        def check(m):
+            return m.author == user
+        await interaction.response.send_message(f"chat vacuuming in progress")
+        await interaction.channel.purge(limit=amount+1, check=check)
+        await interaction.channel.purge(limit=1)
+    except:
+        await interaction.response.send_message(f"You dont have priviliges to use this command")
+        
 
 
-@tree.command(name="csgostats", description="See Your stats in CS GO", guild=discord.Object(id=os.getenv("GUILD")))
+@tree.command(name="csgostats", description="See Your stats in CS GO")
 async def command(interaction: discord.Interaction, id: str):
 
     try:
@@ -75,19 +82,19 @@ async def command(interaction: discord.Interaction, id: str):
         embed.set_footer(text=f'Data povided by: https://tracker.gg/csgo')
         await interaction.response.send_message(embed=embed, view=view)
 
-@tree.command(name= "tier", description= "Tiers are assigned using slot price identification", guild=discord.Object(id=os.getenv("GUILD")))
+@tree.command(name= "tier", description= "Tiers are assigned using slot price identification")
 async def tier(interaction: discord.Interaction):
     currency = "\u20BD"
     greaterorequal = '\u2265'
     embed = discord.Embed(title=f"Loot Tiers", color=0x00bfff)
-    embed.add_field(name=":star:Legendary", value=f"{greaterorequal} 40 000{currency}", inline=False)
-    embed.add_field(name=":green_circle:Great", value=f"{greaterorequal} 30 000{currency}", inline=False)
-    embed.add_field(name=":yellow_circle:Average", value=f"{greaterorequal} 20 000{currency}", inline=False)
-    embed.add_field(name=":red_circle:Poor", value=f"{greaterorequal} 10 000{currency}", inline=False)
-    embed.add_field(name=":x:Trash", value=f"< 10 000{currency}",  inline=False)
+    embed.add_field(name=":star:Legendary", value=f"{greaterorequal} 40000{currency}", inline=False)
+    embed.add_field(name=":green_circle:Great", value=f"{greaterorequal} 30000{currency}", inline=False)
+    embed.add_field(name=":yellow_circle:Average", value=f"{greaterorequal} 20000{currency}", inline=False)
+    embed.add_field(name=":red_circle:Poor", value=f"{greaterorequal} 10000{currency}", inline=False)
+    embed.add_field(name=":x:Trash", value=f"< 10000{currency}",  inline=False)
     await interaction.response.send_message(embed=embed)      
 
-@tree.command(name= "price", description= "Check the price of Escape from Tarkov items", guild=discord.Object(id=os.getenv("GUILD")))
+@tree.command(name= "price", description= "Check the price of Escape from Tarkov items")
 async def command(interaction: discord.Interaction,search: str):
     try:
         currency = "\u20BD"
@@ -138,7 +145,7 @@ class regions(Enum):
     Turkey = "TR1"
     Koeran = "KR"
  
-@tree.command(name="summonerstats", description="See your stats in League of Legends", guild=discord.Object(id=os.getenv("GUILD")))
+@tree.command(name="summonerstats", description="See your stats in League of Legends")
 async def command(interaction: discord.Interaction, nickname: str, region: regions):
     try:
         app_commands.choices
@@ -174,7 +181,7 @@ async def command(interaction: discord.Interaction, nickname: str, region: regio
         embed.set_footer(text="Data povided by: https://www.leagueoflegends.com/")
         await interaction.response.send_message(embed=embed, view=view)
         
-@tree.command(name= "weather", description= "Check the weather of your city!", guild=discord.Object(id=os.getenv("GUILD")))
+@tree.command(name= "weather", description= "Check the weather of your city!")
 async def weather(interaction: discord.Interaction, city: str ):
     try:
         celsius = '\u2103'
@@ -211,7 +218,7 @@ async def weather(interaction: discord.Interaction, city: str ):
 
 @client.event
 async def on_ready():
-    await tree.sync(guild=discord.Object(id=os.getenv("GUILD")))
+    await tree.sync()
     print(f'We have logged in as {client.user}')
 
 
