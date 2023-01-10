@@ -29,7 +29,7 @@ async def clear(interaction: discord.Interaction, amount: int):
     await interaction.channel.purge(limit=amount+1)
 
 
-@tree.command(name= "clearuser", description= "select the user whose messages you want to delete and enter the number of messages")
+@tree.command(name= "clearuser", description= "Select the user whose messages you want to delete and enter the number of messages")
 @commands.has_permissions(manage_messages=True, manage_roles=True)
 async def clearuser(interaction: discord.Interaction, user: discord.User, amount: int):
   def check(m):
@@ -141,7 +141,6 @@ class regions(Enum):
 @tree.command(name="summonerstats", description="See your stats in League of Legends")
 async def command(interaction: discord.Interaction, nickname: str, region: regions):
     try:
-        app_commands.choices
         player = summonerstats(nickname, region.value) 
         view = View()
         embed = discord.Embed(title=f"Nick: {player.username}", color=0x00bfff)
@@ -174,6 +173,29 @@ async def command(interaction: discord.Interaction, nickname: str, region: regio
         embed.set_footer(text="Data povided by: https://www.leagueoflegends.com/")
         await interaction.response.send_message(embed=embed, view=view)
 
+@tree.command(name="tftstats", description="See your stats in Teamfight Tactics")
+async def command(interaction: discord.Interaction, nickname: str, region: regions):
+    try:
+        player = tftstats(nickname, region.value)
+        view = View()
+        embed = discord.Embed(title=f"Nick: {player.tftUsername}", color=0x00bfff)
+        embed.set_thumbnail(url=player.tftIcon)
+        embed.add_field(name="Summoner level:", value=f"{player.tftSummonerLevel}", inline=False)
+        if hasattr(player,'tftTier') != 0:
+            embed.add_field(name="Rank Solo:", value=f"{player.tftTier} {player.tftRank}\n\n> **Wins:** {player.tftWins}\n> **Losses:** {player.tftLosses}\n> **All Games:** {player.tftAllGames}\n> **Winratio:** {round(player.tftWinratio,2)}%",inline=True)
+        if hasattr(player,'tftTurboTier') != 0:    
+            embed.add_field(name="Rank Turbo:", value=f"{player.tftTurboTier} {player.tftTurboRank}\n\n> **Wins:** {player.tftTurboWins}\n> **Losses:** {player.tftTurboLosses}\n> **All Games:** {player.tftTurboAllGames}\n> **Winratio:** {round(player.tftTurboWinratio,2)}%",inline=True)
+        if hasattr(player,'tftDoubleTier') != 0:    
+            embed.add_field(name="Rank Double:", value=f"{player.tftDoubleTier} {player.tftDoubleRank}\n\n> **Wins:** {player.tftDoubleWins}\n> **Losses:** {player.tftDoubleLosses}\n> **All Games:** {player.tftDoubleAllGames}\n> **Winratio:** {round(player.tftDoubleWinratio,2)}%",inline=True)
+        embed.add_field(name="Data povided by:", value = "https://developer.riotgames.com/", inline=False)
+        await interaction.response.send_message(embed=embed, view=view)
+    except:
+        view = View()
+        embed = discord.Embed(title="ERROR 404: NOT FOUND", color=0x00bfff)
+        embed.add_field(name=f"User {nickname} on region {region.name} do not exist", value="Check the spelling, or try with other region", inline=False)
+        embed.set_footer(text="Data povided by: https://developer.riotgames.com/")
+        await interaction.response.send_message(embed=embed, view=view)   
+
 class ApexPlatforms(Enum):
     Origin = "origin"
     XboxLive = "xbl"
@@ -204,34 +226,25 @@ async def command(interaction: discord.Interaction, nickname: str, platform: Ape
         embed.set_footer(text="Data povided by: https://tracker.gg/apex")
         await interaction.response.send_message(embed=embed, view=view)
 
-
-@tree.command(name="tftstats", description="See your stats in Teamfight Tactics")
-async def command(interaction: discord.Interaction, nickname: str, region: regions):
-    try:
-        player = tftstats(nickname, region.value)
-        view = View()
-        embed = discord.Embed(title=f"Nick: {player.tftUsername}", color=0x00bfff)
-        embed.set_thumbnail(url=player.tftIcon)
-        embed.add_field(name="Summoner level:", value=f"{player.tftSummonerLevel}", inline=False)
-        if hasattr(player,'tftTier') != 0:
-            embed.add_field(name="Rank Solo:", value=f"{player.tftTier} {player.tftRank}\n\n> **Wins:** {player.tftWins}\n> **Losses:** {player.tftLosses}\n> **All Games:** {player.tftAllGames}\n> **Winratio:** {round(player.tftWinratio,2)}%",inline=True)
-        if hasattr(player,'tftTurboTier') != 0:    
-            embed.add_field(name="Rank Turbo:", value=f"{player.tftTurboTier} {player.tftTurboRank}\n\n> **Wins:** {player.tftTurboWins}\n> **Losses:** {player.tftTurboLosses}\n> **All Games:** {player.tftTurboAllGames}\n> **Winratio:** {round(player.tftTurboWinratio,2)}%",inline=True)
-        if hasattr(player,'tftDoubleTier') != 0:    
-            embed.add_field(name="Rank Double:", value=f"{player.tftDoubleTier} {player.tftDoubleRank}\n\n> **Wins:** {player.tftDoubleWins}\n> **Losses:** {player.tftDoubleLosses}\n> **All Games:** {player.tftDoubleAllGames}\n> **Winratio:** {round(player.tftDoubleWinratio,2)}%",inline=True)
-        embed.add_field(name="Data povided by:", value = "https://developer.riotgames.com/", inline=False)
-        await interaction.response.send_message(embed=embed, view=view)
-    except:
-        view = View()
-        embed = discord.Embed(title="ERROR 404: NOT FOUND", color=0x00bfff)
-        embed.add_field(name=f"User {nickname} on region {region.name} do not exist", value="Check the spelling, or try with other region", inline=False)
-        embed.set_footer(text="Data povided by: https://developer.riotgames.com/")
-        await interaction.response.send_message(embed=embed, view=view)   
-
+@tree.command(name="help", description="Help for all commands")
+async def command(interaction: discord.Interaction):
+    view = View()
+    embed = discord.Embed(title="Help", color=0x00bfff)
+    embed.add_field(name="/clear", value="Clearing specific amount of messages", inline=False)
+    embed.add_field(name="/clearuser", value="Select the user whose messages you want to delete and enter the number of messages", inline=False)
+    embed.add_field(name="/csgostats", value="See Your stats in Counter Strike Global Offensive", inline=False)
+    embed.add_field(name="/price", value="Check the price of Escape from Tarkov items", inline=False)
+    embed.add_field(name="/tier", value="Tiers are assigned using slot price identification used in price command", inline=False)
+    embed.add_field(name="/summonerstats", value="See your stats in League of Legends", inline=False)
+    embed.add_field(name="/tftstats", value="See your stats in Teamfight Tactics", inline=False)
+    embed.add_field(name="/apexstats", value="See your stats in Apex", inline=False)
+    embed.add_field(name="/weather", value="See weather in specific city", inline=False)
+    await interaction.response.send_message(embed=embed, view=view)
 
 @client.event
 async def on_ready():
     await tree.sync()
+    await client.change_presence(status=discord.Status.online, activity=discord.Game("/help"))
     print(f'We have logged in as {client.user}')
 
 
