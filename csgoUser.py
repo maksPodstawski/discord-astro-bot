@@ -7,7 +7,7 @@ load_dotenv()
 
 PLATFORM = "steam"
 
-params = {'TRN-Api-Key': os.getenv("API_KEY"), 'Accept': 'application/json', 'Accept-Encoding': 'gzip'}
+headers = {'TRN-Api-Key': os.getenv("API_KEY"), 'Accept': 'application/json', 'Accept-Encoding': 'gzip'}
 
 
 class csgoUser:
@@ -36,7 +36,8 @@ class csgoUser:
             self.headshotPct = self.allStats["data"]["segments"][0]["stats"]["headshotPct"]["displayValue"]
 
     def getJSON(self):
-        response = requests.get(self.url, params=params)
+        response = requests.get(self.url, headers=headers)
         self.response = response.status_code
         json_response = response.json()
         return json_response
+
