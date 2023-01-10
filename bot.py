@@ -22,14 +22,14 @@ client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 
 
-@tree.command(name= "clear", description= "Select the number of messages to clear", guild=discord.Object(id=1034080877615001670))
+@tree.command(name= "clear", description= "Select the number of messages to clear", guild=discord.Object(id=os.getenv("GUILD")))
 @commands.has_permissions(manage_messages=True)
 async def clear(interaction: discord.Interaction, amount: int):
     await interaction.response.send_message(f"chat vacuuming in progress")
     await interaction.channel.purge(limit=amount+1)
 
 
-@tree.command(name= "clearuser", description= "select the user whose messages you want to delete and enter the number of messages", guild=discord.Object(id=1034080877615001670))
+@tree.command(name= "clearuser", description= "select the user whose messages you want to delete and enter the number of messages", guild=discord.Object(id=os.getenv("GUILD")))
 @commands.has_permissions(manage_messages=True, manage_roles=True)
 async def clearuser(interaction: discord.Interaction, user: discord.User, amount: int):
   def check(m):
@@ -39,7 +39,7 @@ async def clearuser(interaction: discord.Interaction, user: discord.User, amount
   await interaction.channel.purge(limit=1)
 
 
-@tree.command(name="csgostats", description="See Your stats in CS GO", guild=discord.Object(id=1034080877615001670))
+@tree.command(name="csgostats", description="See Your stats in CS GO", guild=discord.Object(id=os.getenv("GUILD")))
 async def command(interaction: discord.Interaction, id: str):
 
     try:
@@ -75,7 +75,7 @@ async def command(interaction: discord.Interaction, id: str):
         embed.set_footer(text=f'Data povided by: https://tracker.gg/csgo')
         await interaction.response.send_message(embed=embed, view=view)
 
-@tree.command(name= "tier", description= "Tiers are assigned using slot price identification", guild=discord.Object(id=1034080877615001670))
+@tree.command(name= "tier", description= "Tiers are assigned using slot price identification", guild=discord.Object(id=os.getenv("GUILD")))
 async def tier(interaction: discord.Interaction):
     currency = "\u20BD"
     greaterorequal = '\u2265'
@@ -87,7 +87,7 @@ async def tier(interaction: discord.Interaction):
     embed.add_field(name=":x:Trash", value=f"< 10 000{currency}",  inline=False)
     await interaction.response.send_message(embed=embed)      
 
-@tree.command(name= "price", description= "Check the price of Escape from Tarkov items", guild=discord.Object(id=1034080877615001670))
+@tree.command(name= "price", description= "Check the price of Escape from Tarkov items", guild=discord.Object(id=os.getenv("GUILD")))
 async def command(interaction: discord.Interaction,search: str):
     try:
         currency = "\u20BD"
@@ -138,7 +138,7 @@ class regions(Enum):
     Turkey = "TR1"
     Koeran = "KR"
  
-@tree.command(name="summonerstats", description="See your stats in League of Legends", guild=discord.Object(id=1034080877615001670))
+@tree.command(name="summonerstats", description="See your stats in League of Legends", guild=discord.Object(id=os.getenv("GUILD")))
 async def command(interaction: discord.Interaction, nickname: str, region: regions):
     try:
         app_commands.choices
@@ -174,7 +174,7 @@ async def command(interaction: discord.Interaction, nickname: str, region: regio
         embed.set_footer(text="Data povided by: https://www.leagueoflegends.com/")
         await interaction.response.send_message(embed=embed, view=view)
         
-@tree.command(name= "weather", description= "Check the weather of your city!", guild=discord.Object(id=1034080877615001670))
+@tree.command(name= "weather", description= "Check the weather of your city!", guild=discord.Object(id=os.getenv("GUILD")))
 async def weather(interaction: discord.Interaction, city: str ):
     try:
         celsius = '\u2103'
@@ -185,7 +185,6 @@ async def weather(interaction: discord.Interaction, city: str ):
         pressure = data['cisnienie']
         hours = data['godzina_pomiaru']
         dates = data['data_pomiaru']
-        id_weather = data['id_stacji']
         percipitation = data['suma_opadu']
         icon = "https://pl.seaicons.com/wp-content/uploads/2015/10/weather-icon3.png"
         if temperature < 0:
@@ -194,9 +193,8 @@ async def weather(interaction: discord.Interaction, city: str ):
             icon = 'https://cdn-icons-png.flaticon.com/512/979/979585.png'
         embed = discord.Embed(title=f"Weather forecast for {citywithpl}", color=0x00bfff)
         embed.set_thumbnail(url=icon)
-        embed.add_field(name="Weather station id", value=f" > {id_weather}", inline=False)
-        embed.add_field(name="Measuring date", value=f" > {dates}", inline=False)
-        embed.add_field(name="Measuring hour", value=f" >  {hours}:00", inline=False)
+        embed.add_field(name="Measuring date", value=f" > {dates}", inline=True)
+        embed.add_field(name="Measuring hour", value=f" >  {hours}:00", inline=True)
         embed.add_field(name="Temperature", value=f" >  {temperature}{celsius}", inline=False)
         embed.add_field(name="Atmospheric pressure", value=f" >  {pressure}hPa", inline=False)
         embed.add_field(name="Total precipitation", value=f" >  {percipitation}mm", inline=False)
@@ -213,7 +211,7 @@ async def weather(interaction: discord.Interaction, city: str ):
 
 @client.event
 async def on_ready():
-    await tree.sync(guild=discord.Object(id=1034080877615001670))
+    await tree.sync(guild=discord.Object(id=os.getenv("GUILD")))
     print(f'We have logged in as {client.user}')
 
 
