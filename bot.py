@@ -186,7 +186,7 @@ async def command(interaction: discord.Interaction, nickname: str, platform: Ape
     if apexPlayer.response == 200:
         view = View()
         apexPlayer = apexstats(platform=platform.value, nickname=nickname)
-        embed = discord.Embed(title=f"User {nickname}", color=0x00bfff)
+        embed = discord.Embed(title=f"{nickname}", color=0x00bfff)
         embed.set_thumbnail(url=apexPlayer.avatarUrl)
         embed.add_field(name="Kills: ", value=apexPlayer.kills, inline=True)
         embed.add_field(name="Level: ", value=apexPlayer.level, inline=True)
