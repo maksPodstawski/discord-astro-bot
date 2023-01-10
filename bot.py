@@ -12,6 +12,7 @@ from datetime import datetime
 from riot import summonerstats, tftstats
 import os
 from enum import Enum
+from weather import get_city, get_weather_data
 
 load_dotenv()
 
@@ -25,19 +26,25 @@ tree = app_commands.CommandTree(client)
 @tree.command(name= "clear", description= "Select the number of messages to clear")
 @commands.has_permissions(manage_messages=True)
 async def clear(interaction: discord.Interaction, amount: int):
-    await interaction.response.send_message(f"chat vacuuming in progress")
-    await interaction.channel.purge(limit=amount+1)
+    try:
+        await interaction.response.send_message(f"chat vacuuming in progress")
+        await interaction.channel.purge(limit=amount+1)
+    except:
+        await interaction.response.send_message(f"You dont have priviliges to use this command")
 
 
-@tree.command(name= "clearuser", description= "Select the user whose messages you want to delete and enter the number of messages")
-@commands.has_permissions(manage_messages=True, manage_roles=True)
-async def clearuser(interaction: discord.Interaction, user: discord.User, amount: int):
-  def check(m):
-    return m.author == user
-  await interaction.response.send_message(f"chat vacuuming in progress")
-  await interaction.channel.purge(limit=amount+1, check=check)
-  await interaction.channel.purge(limit=1)
 
+@tree.command(name= "clearuser", description= "select the user whose messages you want to delete and enter the number of messages")
+@commands.has_permissions(manage_messages=True)
+async def clearuser(interaction: discord.Interaction, user: discord.User, amount: int):  
+    try:
+        def check(m):
+            return m.author == user
+        await interaction.response.send_message(f"chat vacuuming in progress")
+        await interaction.channel.purge(limit=amount+1, check=check)
+        await interaction.channel.purge(limit=1)
+    except:
+        await interaction.response.send_message(f"You dont have priviliges to use this command")
 
 @tree.command(name="csgostats", description="See Your stats in CS GO")
 async def command(interaction: discord.Interaction, id: str):
@@ -80,11 +87,11 @@ async def tier(interaction: discord.Interaction):
     currency = "\u20BD"
     greaterorequal = '\u2265'
     embed = discord.Embed(title=f"Loot Tiers", color=0x00bfff)
-    embed.add_field(name=":star:Legendary", value=f"{greaterorequal} 40�000{currency}", inline=False)
-    embed.add_field(name=":green_circle:Great", value=f"{greaterorequal} 30�000{currency}", inline=False)
-    embed.add_field(name=":yellow_circle:Average", value=f"{greaterorequal} 20�000{currency}", inline=False)
-    embed.add_field(name=":red_circle:Poor", value=f"{greaterorequal} 10�000{currency}", inline=False)
-    embed.add_field(name=":x:Trash", value=f"< 10 000{currency}",  inline=False)
+    embed.add_field(name=":star:Legendary", value=f"{greaterorequal} 40000{currency}", inline=False)
+    embed.add_field(name=":green_circle:Great", value=f"{greaterorequal} 30000{currency}", inline=False)
+    embed.add_field(name=":yellow_circle:Average", value=f"{greaterorequal} 20000{currency}", inline=False)
+    embed.add_field(name=":red_circle:Poor", value=f"{greaterorequal} 10000{currency}", inline=False)
+    embed.add_field(name=":x:Trash", value=f"< 10000{currency}",  inline=False)
     await interaction.response.send_message(embed=embed)      
 
 @tree.command(name= "price", description= "Check the price of Escape from Tarkov items")
@@ -174,6 +181,38 @@ async def command(interaction: discord.Interaction, nickname: str, region: regio
         embed.set_footer(text="Data povided by: https://developer.riotgames.com/")
         await interaction.response.send_message(embed=embed, view=view)
         
+@tree.command(name= "weather", description= "Check the weather of your city!")
+async def weather(interaction: discord.Interaction, city: str ):
+    try:
+        celsius = '\u2103'
+        city_number = get_city(city)
+        data = get_weather_data(city_number)
+        citywithpl = data['stacja']
+        temperature = float(data['temperatura'])
+        pressure = data['cisnienie']
+        hours = data['godzina_pomiaru']
+        dates = data['data_pomiaru']
+        percipitation = data['suma_opadu']
+        icon = "https://pl.seaicons.com/wp-content/uploads/2015/10/weather-icon3.png"
+        if temperature < 0:
+            icon = 'https://cdn-icons-png.flaticon.com/512/6232/6232631.png'
+        if temperature > 20:
+            icon = 'https://cdn-icons-png.flaticon.com/512/979/979585.png'
+        embed = discord.Embed(title=f"Weather forecast for {citywithpl}", color=0x00bfff)
+        embed.set_thumbnail(url=icon)
+        embed.add_field(name="Measuring date", value=f" > {dates}", inline=True)
+        embed.add_field(name="Measuring hour", value=f" >  {hours}:00", inline=True)
+        embed.add_field(name="Temperature", value=f" >  {temperature}{celsius}", inline=False)
+        embed.add_field(name="Atmospheric pressure", value=f" >  {pressure}hPa", inline=False)
+        embed.add_field(name="Total precipitation", value=f" >  {percipitation}mm", inline=False)
+        embed.set_footer(text="Data povided by: https://danepubliczne.imgw.pl/api/data/synop/")
+        await interaction.response.send_message(embed=embed)
+    except:
+        embed = discord.Embed(title="ERROR 404: NOT FOUND", color=0x00bfff)
+        embed.add_field(name=f"City {city} do not exist in database", value="This command only show weather of poland cites \n where weather outposts are located", inline=False)
+        embed.set_footer(text="Data povided by: https://danepubliczne.imgw.pl/api/data/synop/")
+        await interaction.response.send_message(embed=embed)
+
 @tree.command(name="tftstats", description="See your stats in Teamfight Tactics")
 async def command(interaction: discord.Interaction, nickname: str, region: regions):
     try:
