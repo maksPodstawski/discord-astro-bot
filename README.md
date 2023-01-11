@@ -6,6 +6,10 @@ A simple bot that retrieves statistical information about in game statistics and
 * Shownig live prices from market in game Escape From Tarkov
 * Display of live weather in a particular city
 
+## Requirements
+* Riot API key, You can get it [there](https://developer.riotgames.com/)
+* Tracker.gg API key, You can get it [there](https://tracker.gg/developers/)
+
 ## Installation
 1. Clone the repository: git clone `https://github.com/maksPodstawski/discord-astro-bot`
 2. Install the required libraries: `pip install -r requirements.txt`
